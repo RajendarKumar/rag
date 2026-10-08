@@ -1,0 +1,13 @@
+.env
+.vscode/
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+/build/
+/dist/
+/chroma_db/
+/data/*
+!/data/.gitkeep
+.DS_Store

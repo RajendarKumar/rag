@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "rag-engine"
+version = "0.1.0"
+description = "A local and hybrid retrieval-augmented generation application."
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "langchain-chroma>=0.2",
+    "langchain-community>=0.3",
+    "langchain-core>=0.3",
+    "langchain-google-genai>=2.0",
+    "langchain-text-splitters>=0.3",
+    "pymilvus[model]>=2.5,<3",
+    "pypdf>=5.0",
+    "python-dotenv>=1.0",
+    "scipy>=1.10",
+]
+
+[project.scripts]
+rag-ingest = "rag_engine.cli.ingest:main"
+rag-query = "rag_engine.cli.query:main"
+rag-hybrid-demo = "rag_engine.cli.pipeline:main"
+
+[tool.setuptools.packages.find]
+include = ["rag_engine*"]
