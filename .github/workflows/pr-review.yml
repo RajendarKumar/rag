@@ -1,0 +1,61 @@
+name: AI PR Review Agent
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+  issue_comment:
+    types: [created]
+
+concurrency:
+  group: pr-review-${{ github.event.pull_request.number || github.event.issue.number }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  review:
+    name: PR Review (Module A)
+    if: >-
+      vars.AGENT_ENABLED != 'false' &&
+      (
+        (github.event_name == 'pull_request' &&
+         github.event.pull_request.draft == false &&
+         github.event.pull_request.head.repo.full_name == github.repository &&
+         !contains(github.event.pull_request.labels.*.name, 'no-agent')) ||
+        (github.event_name == 'issue_comment' &&
+         github.event.issue.pull_request != null &&
+         contains(github.event.comment.body, '/agent review'))
+      )
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install PR Review Agent
+        run: pip install git+https://github.com/RajendarKumar/pr-review-agent.git@main
+
+      - name: Run PR Review Agent
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GITHUB_EVENT_PATH: ${{ github.event_path }}
+          LLM_PROVIDER: ${{ vars.LLM_PROVIDER || 'openai' }}
+          LLM_MODEL: ${{ vars.LLM_MODEL || '' }}
+          LLM_BASE_URL: ${{ vars.LLM_BASE_URL || '' }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          AGENT_DRY_RUN: ${{ vars.AGENT_DRY_RUN || 'false' }}
+          AGENT_MAX_COMMENTS: ${{ vars.AGENT_MAX_COMMENTS || '20' }}
+          AGENT_MIN_CONFIDENCE: ${{ vars.AGENT_MIN_CONFIDENCE || '0.7' }}
+        run: pr-review-agent
