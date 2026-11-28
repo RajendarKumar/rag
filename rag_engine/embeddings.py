@@ -100,3 +100,9 @@ class HybridEmbeddingEngine:
         else:
             sparse_vector = raw_sparse[0]
         return dense_vector, sparse_vector
+
+    def embed_texts(self, texts: list[str]) -> list[list[float]]:
+        """Embed a list of text chunks using the dense client."""
+        if not texts:
+            return []
+        return self.dense_client.embed_documents(texts)

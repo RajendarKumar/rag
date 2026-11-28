@@ -22,3 +22,23 @@ def validate_environment() -> None:
     if not os.environ.get("GOOGLE_API_KEY"):
         raise ValueError("CRITICAL: GOOGLE_API_KEY environment variable is missing.")
     DATA_DIR.mkdir(parents=True, exist_ok=True)
+
+
+def get_chunk_config() -> dict[str, int]:
+    """Return chunk sizes from environment overrides."""
+    return {
+        "parent_size": int(os.getenv("RAG_PARENT_CHUNK_SIZE", PARENT_CHUNK_SIZE)),
+        "parent_overlap": int(os.getenv("RAG_PARENT_CHUNK_OVERLAP", PARENT_CHUNK_OVERLAP)),
+        "child_size": int(os.getenv("RAG_CHILD_CHUNK_SIZE", CHILD_CHUNK_SIZE)),
+        "child_overlap": int(os.getenv("RAG_CHILD_CHUNK_OVERLAP", CHILD_CHUNK_OVERLAP)),
+    }
+
+
+def is_valid_chunk_size(size: int, overlap: int) -> bool:
+    """Check whether chunk size configuration is positive."""
+    return size > 0 and overlap >= 0
+
+
+def get_data_file_path(filename: str) -> Path:
+    """Resolve a data file path inside DATA_DIR."""
+    return DATA_DIR / filename
