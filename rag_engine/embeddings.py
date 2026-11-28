@@ -103,4 +103,6 @@ class HybridEmbeddingEngine:
 
     def embed_texts(self, texts: list[str]) -> list[list[float]]:
         """Embed a list of text chunks using the dense client."""
-        return [self.dense_client.embed_query(text) for text in texts]
+        if not texts:
+            return []
+        return self.dense_client.embed_documents(texts)
