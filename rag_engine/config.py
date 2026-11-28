@@ -37,3 +37,8 @@ def get_chunk_config() -> dict[str, int]:
 def is_valid_chunk_size(size: int, overlap: int) -> bool:
     """Check whether chunk size configuration is positive."""
     return size > 0 and overlap >= 0
+
+
+def get_data_file_path(filename: str) -> Path:
+    """Resolve a data file path inside DATA_DIR."""
+    return DATA_DIR / filename
